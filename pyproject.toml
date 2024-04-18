@@ -51,6 +51,7 @@ path = "src/vocr/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 only-include = ["src", "tests"]
+exclude = ["tests/output"]
 
 [tool.hatch.envs.default]
 dependencies = ["coverage[toml]", "pytest-cov", "pytest"]

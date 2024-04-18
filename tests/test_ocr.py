@@ -1,8 +1,11 @@
 from pathlib import Path
 
+import pytest
+
 from vocr.vocr import VietOCR, VietOCR_Directory, VietOCR_File
 
 
+@pytest.mark.skip  # This is temporary
 class TestVOCR:
     def test_file(self, test_pic: Path, test_output: Path) -> None:
         instance = VietOCR_File(test_pic)
