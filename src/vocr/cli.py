@@ -1,3 +1,5 @@
+__all__ = ["cli"]
+
 import platform
 
 import click
