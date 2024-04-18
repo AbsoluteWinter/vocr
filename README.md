@@ -6,7 +6,6 @@ Vietnamese OCR
 
 - [Tesseract](https://github.com/UB-Mannheim/tesseract) installed and added to PATH
 
-- Clone this project
 
 ## Install
 
