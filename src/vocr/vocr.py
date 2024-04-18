@@ -3,17 +3,16 @@ from __future__ import annotations  # Maybe needed
 __all__ = ["VietOCR"]
 
 from pathlib import Path
-from typing import Literal, Union
+from typing import List, Literal, Union
 
 import cv2
 import pytesseract
 from cv2.typing import MatLike
+from joblib import Parallel, delayed
 from PIL import Image
 from tqdm import tqdm
 
 VALID_IMG_SUFFIX = [".jpg", ".jpeg", ".png"]
-
-# TODO: Multithread OCR
 
 
 class VietOCR_File:
@@ -87,6 +86,25 @@ class VietOCR_Directory:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.image_path.name})"
 
+    def list_of_img(self) -> List[Path]:
+        list_of_img = [
+            img
+            for img in self.image_path.iterdir()
+            if img.suffix.lower() in VALID_IMG_SUFFIX
+        ]
+        return list_of_img
+
+    def make_save_destination(
+        self,
+        save_destination: Union[str, Path, None] = None,
+    ) -> Path:
+        if save_destination is not None:
+            save_folder = Path(save_destination)
+        else:
+            save_folder = self.image_path.with_name(f"{self.image_path.name}_extracted")
+        save_folder.mkdir(exist_ok=True, parents=True)
+        return save_folder
+
     def ocr(
         self,
         save_destination: Union[str, Path, None] = None,
@@ -99,22 +117,34 @@ class VietOCR_Directory:
         :param preprocess: Preprocess, defaults to "thresh"
         :type preprocess: Literal[&quot;thresh&quot;, &quot;blur&quot;], optional
         """
-        list_of_img = [
-            img
-            for img in self.image_path.iterdir()
-            if img.suffix.lower() in VALID_IMG_SUFFIX
-        ]
-
-        if save_destination is not None:
-            save_folder = Path(save_destination)
-        else:
-            save_folder = self.image_path.with_name(f"{self.image_path.name}_extracted")
-        save_folder.mkdir(exist_ok=True, parents=True)
-
-        for img in tqdm(list_of_img, desc="Extracting text", unit_scale=True, ncols=88):
+        save_folder = self.make_save_destination(save_destination)
+        for img in tqdm(
+            self.list_of_img(), desc="Extracting text", unit_scale=True, ncols=88
+        ):
             ocr_engine = VietOCR_File(img, lang=self.lang)
             save_path = save_folder.joinpath(img.with_suffix(".txt").name)
             ocr_engine.ocr(save_destination=save_path, preprocess=preprocess)
+
+    def ocr_multithread(
+        self,
+        n_jobs: int = -1,
+        save_destination: Union[str, Path, None] = None,
+        preprocess: Literal["thresh", "blur"] = "thresh",
+    ) -> None:
+        save_folder = self.make_save_destination(save_destination)
+
+        def _ocr(img: Path):
+            ocr_engine = VietOCR_File(img, lang=self.lang)
+            save_path = save_folder.joinpath(img.with_suffix(".txt").name)
+            ocr_engine.ocr(save_destination=save_path, preprocess=preprocess)
+
+        # Multithread
+        Parallel(n_jobs=n_jobs)(
+            delayed(_ocr)(img)
+            for img in tqdm(
+                self.list_of_img(), desc="Extracting text", unit_scale=True, ncols=88
+            )
+        )
 
 
 class VietOCR:
@@ -138,4 +168,9 @@ class VietOCR:
         save_destination: Union[str, Path, None] = None,
         preprocess: Literal["thresh", "blur"] = "thresh",
     ) -> None:
-        self.engine.ocr(save_destination=save_destination, preprocess=preprocess)
+        try:
+            self.engine.ocr_multithread(
+                save_destination=save_destination, preprocess=preprocess
+            )
+        except Exception:
+            self.engine.ocr(save_destination=save_destination, preprocess=preprocess)
