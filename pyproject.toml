@@ -30,12 +30,13 @@ dependencies = [
     "pillow",
     "pytesseract",
     "tqdm",
-    # 
-    "importlib_resources; python_version < '3.10'",
-    "tomli>=1.1.0; python_version < '3.11'",
-    "typing_extensions>=4.5.0; python_version < '3.12'",
 ]
 dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/AbsoluteWinter/vocr"
+Repository = "https://github.com/AbsoluteWinter/vocr"
+Issues = "https://github.com/AbsoluteWinter/vocr/issues"
 
 [project.optional-dependencies]
 dev = ["hatch", "pytest>=7.0.0"]
@@ -49,6 +50,24 @@ path = "src/vocr/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 only-include = ["src", "tests"]
+
+[tool.hatch.envs.default]
+dependencies = ["coverage[toml]", "pytest-cov", "pytest"]
+description = """
+Default environment
+
+Main cmd:
+- test: Run test
+- cov : Show coverage report
+- cov2: More coverage report
+"""
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"                                        # use this
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]                                    # use this
+cov2 = "pytest --cov-report=term-missing --cov=absfuyu --cov=tests" # use this
 
 [tool.hatch.envs.checker]
 dependencies = ["mypy>=1.0.0", "ruff"]
@@ -87,6 +106,36 @@ build = [
 live = [
     "sphinx-apidoc -o docs/ src/vocr",  # Generate
     "sphinx-autobuild docs docs/build", # Live preview
+]
+
+[tool.hatch.envs.buildwindows]
+dependencies = ["pyinstaller"]
+description = "Build .exe for windows"
+
+[tool.hatch.envs.buildwindows.scripts]
+build = "pyinstaller --noconfirm --onefile --console --name=vocr --clean src/vocr/__main__.py"
+
+[tool.hatch.envs.workflow]
+detached = true
+skip-install = true
+description = """
+Package workflow
+"""
+
+[tool.hatch.envs.workflow.scripts]
+prebuilt = [
+    "hatch run checker:fmt",   #
+    "hatch run checker:check",
+]
+build = [
+    "prebuilt",    #
+    "hatch clean",
+    "hatch build",
+    # "hatch run buildwindows:build",
+]
+release = [
+    "build",         #
+    "hatch publish",
 ]
 
 [tool.pytest.ini_options]

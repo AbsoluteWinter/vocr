@@ -45,7 +45,7 @@ def version() -> None:
 def ocr(src: str, preprocess: str, output: str) -> None:
     """Performs OCR on file/directory"""
     instance = VietOCR(Path(src))
-    instance.ocr(save_destination=output, preprocess=preprocess)
+    instance.ocr(save_destination=output, preprocess=preprocess)  # type: ignore
 
 
 @click.group(name="cli")

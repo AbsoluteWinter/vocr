@@ -55,7 +55,7 @@ class VietOCR_File:
         text = pytesseract.image_to_string(Image.fromarray(gray_img), lang=self.lang)
 
         # Return
-        return text
+        return text  # type: ignore
 
     def ocr(
         self,
@@ -131,7 +131,7 @@ class VietOCR:
         if self.path.is_dir():
             self.engine = VietOCR_Directory(self.path, lang=self.lang)
         else:
-            self.engine = VietOCR_File(self.path, lang=self.lang)
+            self.engine = VietOCR_File(self.path, lang=self.lang)  # type: ignore
 
     def ocr(
         self,
