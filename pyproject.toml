@@ -125,7 +125,8 @@ Package workflow
 
 [tool.hatch.envs.workflow.scripts]
 prebuilt = [
-    "hatch run checker:fmt",   #
+    "hatch run default:test",  #
+    "hatch run checker:fmt",
     "hatch run checker:check",
 ]
 build = [
@@ -166,6 +167,7 @@ include = ["pyproject.toml", "src/**", "tests/**"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+exclude = ["*.json", "*.pkl", "*.jpg", "*.png", "*.jpeg", "*.txt"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "B", "Q"]
