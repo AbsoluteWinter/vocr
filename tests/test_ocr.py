@@ -1,8 +1,8 @@
 from pathlib import Path
 
-import pytest
-
 from vocr.vocr import VietOCR, VietOCR_Directory, VietOCR_File
+
+# import pytest
 
 
 # @pytest.mark.skip  # This is temporary
