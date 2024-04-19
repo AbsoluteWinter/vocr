@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.0.0",
+    "importlib_resources; python_version < '3.10'",
     "joblib",
     "opencv-python",
     "pillow",
@@ -50,7 +51,7 @@ vocr = "vocr.__main__:main"
 path = "src/vocr/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-only-include = ["src", "tests"]
+only-include = ["src", "tests", "docs", "images"]
 exclude = ["tests/output"]
 
 [tool.hatch.envs.default]

@@ -24,7 +24,7 @@
 pip install vocr
 ```
 
-## Usage:
+## Usage
 
 ### Run in Terminal
 ```
@@ -39,6 +39,7 @@ Options:
   --help  Show this message and exit.
 
 Commands:
+  gui      Run vocr with GUI
   ocr      Performs OCR on file/directory
   version  Show current version
 ```
@@ -48,6 +49,10 @@ Commands:
 from vocr import VietOCR
 VietOCR(<path>).ocr()
 ```
+
+## Supported file
+
+- `.jpg`, `.jpeg`, `.png`
 
 ## LICENSE
 
