@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 
 from vocr import __title__, __version__
+from vocr.gui import app_run
 from vocr.vocr import VietOCR
 
 
@@ -48,6 +49,12 @@ def ocr(src: str, preprocess: str, output: str) -> None:
     instance.ocr(save_destination=output, preprocess=preprocess)  # type: ignore
 
 
+@click.command(name="gui")
+def gui() -> None:
+    """Run vocr with GUI"""
+    app_run()
+
+
 @click.group(name="cli")
 def cli() -> None:
     """vocr's command line interface"""
@@ -56,3 +63,4 @@ def cli() -> None:
 
 cli.add_command(version)
 cli.add_command(ocr)
+cli.add_command(gui)
